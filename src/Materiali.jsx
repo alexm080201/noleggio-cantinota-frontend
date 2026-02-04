@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3000";
+const API = "https://noleggio-cantinota-backend.onrender.com";
 
 export default function Materiali() {
   const [materiali, setMateriali] = useState([]);
@@ -270,3 +270,4 @@ const btnDelete = {
   padding: "0.4rem 0.6rem",
   cursor: "pointer",
 };
+
