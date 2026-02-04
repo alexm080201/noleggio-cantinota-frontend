@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default function Login({ onLogin }){
   const [user,setUser]=useState(""); const [pass,setPass]=useState(""); const [err,setErr]=useState("");
-  const API="http://localhost:3000";
+  const API = "https://noleggio-cantinota-backend.onrender.com";
 
   const submit = async (e) => {
     e.preventDefault();
@@ -35,3 +35,4 @@ export default function Login({ onLogin }){
     </div>
   );
 }
+
