@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 
-const API = "http://localhost:3000";
+const API = "https://noleggio-cantinota-backend.onrender.com";
 
 export default function Calendario() {
   const [ordini, setOrdini] = useState([]);
@@ -222,3 +222,4 @@ export default function Calendario() {
     </div>
   );
 }
+
