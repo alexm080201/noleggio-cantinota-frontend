@@ -13,7 +13,7 @@ function App() {
   const [errore, setErrore] = useState("");
   const [modificaOrdine, setModificaOrdine] = useState(null);
 
-  const API = "http://localhost:3000";
+  const API = https://noleggio-cantinota-backend.onrender.com
 
   // Carica dati iniziali
   useEffect(() => {
@@ -243,3 +243,4 @@ function App() {
 }
 
 export default App;
+
