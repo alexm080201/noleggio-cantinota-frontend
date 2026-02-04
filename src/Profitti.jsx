@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Profitti = () => {
   const [dati, setDati] = useState([]);
   const [totaleAnnuale, setTotaleAnnuale] = useState(0);
-  const API = "http://localhost:3000";
+  const API = "https://noleggio-cantinota-backend.onrender.com";
 
   useEffect(() => {
     axios.get(`${API}/ordini`).then(res => {
@@ -50,3 +50,4 @@ const Profitti = () => {
 };
 
 export default Profitti;
+
