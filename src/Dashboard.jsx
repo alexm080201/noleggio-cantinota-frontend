@@ -6,11 +6,11 @@ function Dashboard() {
   const [statistiche, setStatistiche] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/ordini')
+    axios.get('https://noleggio-cantinota-backend.onrender.com/ordini')
       .then(res => setOrdini(res.data))
       .catch(err => console.error('Errore ordini:', err));
 
-    axios.get('http://localhost:3000/statistiche/materiali')
+    axios.get('https://noleggio-cantinota-backend.onrender.com/statistiche/materiali')
       .then(res => setStatistiche(res.data))
       .catch(err => console.error('Errore statistiche:', err));
   }, []);
@@ -70,3 +70,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
