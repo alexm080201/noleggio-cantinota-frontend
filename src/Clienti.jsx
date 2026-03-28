@@ -1,35 +1,38 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "./api";
 
-const API = "https://noleggio-cantinota-backend.onrender.com";
+export default function Clienti({ role = "admin" }) {
+  const isOperatore = role === "operatore";
 
-export default function Clienti() {
   const [clienti, setClienti] = useState([]);
-  const [form, setForm] = useState({ nome: "", telefono: "", indirizzo_spedizione: "" });
+  const [form, setForm] = useState({
+    nome: "",
+    telefono: "",
+    indirizzo_spedizione: "",
+  });
   const [editingId, setEditingId] = useState(null);
   const [errore, setErrore] = useState("");
 
-  // 🔹 Carica tutti i clienti
   useEffect(() => {
     caricaClienti();
   }, []);
 
   const caricaClienti = async () => {
     try {
-      const res = await axios.get(`${API}/clienti`);
+      const res = await api.get("/clienti");
       setClienti(res.data);
     } catch (err) {
       console.error("Errore caricamento clienti:", err);
     }
   };
 
-  // 🔹 Gestione input form
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Aggiungi o modifica cliente
   const salvaCliente = async () => {
+    if (isOperatore) return;
+
     try {
       if (!form.nome.trim()) {
         setErrore("Il nome è obbligatorio");
@@ -37,11 +40,9 @@ export default function Clienti() {
       }
 
       if (editingId) {
-        // ✏️ Modifica
-        await axios.put(`${API}/clienti/${editingId}`, form);
+        await api.put(`/clienti/${editingId}`, form);
       } else {
-        // ➕ Aggiungi
-        await axios.post(`${API}/clienti/add`, form);
+        await api.post("/clienti/add", form);
       }
 
       setForm({ nome: "", telefono: "", indirizzo_spedizione: "" });
@@ -54,17 +55,23 @@ export default function Clienti() {
     }
   };
 
-  // ✏️ Carica i dati di un cliente nel form per modificarlo
   const modificaCliente = (c) => {
-    setForm({ nome: c.nome, telefono: c.telefono, indirizzo_spedizione: c.indirizzo_spedizione });
+    if (isOperatore) return;
+
+    setForm({
+      nome: c.nome,
+      telefono: c.telefono,
+      indirizzo_spedizione: c.indirizzo_spedizione,
+    });
     setEditingId(c.id);
   };
 
-  // ❌ Elimina cliente
   const eliminaCliente = async (id) => {
+    if (isOperatore) return;
     if (!window.confirm("Sei sicuro di voler eliminare questo cliente?")) return;
+
     try {
-      await axios.delete(`${API}/clienti/${id}`);
+      await api.delete(`/clienti/${id}`);
       caricaClienti();
     } catch (err) {
       console.error("Errore eliminazione cliente:", err);
@@ -73,74 +80,68 @@ export default function Clienti() {
   };
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif", maxWidth: "900px", margin: "auto" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>👥 Gestione Clienti</h1>
+    <div
+      style={{
+        padding: "2rem",
+        fontFamily: "Arial, sans-serif",
+        maxWidth: "900px",
+        margin: "auto",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
+        👥 Gestione Clienti
+      </h1>
 
-      {/* 🔹 Form aggiunta/modifica cliente */}
-      <div
-        style={{
-          background: "#f9f9f9",
-          padding: "1.5rem",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-          marginBottom: "2rem",
-        }}
-      >
-        <h2 style={{ marginBottom: "1rem" }}>{editingId ? "✏️ Modifica Cliente" : "➕ Aggiungi Cliente"}</h2>
-
-        <div style={{ display: "grid", gap: "10px" }}>
-          <input
-            type="text"
-            name="nome"
-            placeholder="Nome Cliente"
-            value={form.nome}
-            onChange={handleChange}
-            style={inputStyle}
-          />
-          <input
-            type="text"
-            name="telefono"
-            placeholder="Telefono"
-            value={form.telefono}
-            onChange={handleChange}
-            style={inputStyle}
-          />
-          <input
-            type="text"
-            name="indirizzo_spedizione"
-            placeholder="Indirizzo di Spedizione"
-            value={form.indirizzo_spedizione}
-            onChange={handleChange}
-            style={inputStyle}
-          />
-        </div>
-
-        {errore && <p style={{ color: "red", marginTop: "10px" }}>{errore}</p>}
-
-        <button
-          onClick={salvaCliente}
+      {!isOperatore && (
+        <div
           style={{
-            marginTop: "1rem",
-            background: "#4caf50",
-            color: "white",
-            padding: "0.6rem 1rem",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
+            background: "#f9f9f9",
+            padding: "1.5rem",
+            borderRadius: "12px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            marginBottom: "2rem",
           }}
         >
-          {editingId ? "💾 Salva Modifiche" : "➕ Aggiungi Cliente"}
-        </button>
+          <h2 style={{ marginBottom: "1rem" }}>
+            {editingId ? "✏️ Modifica Cliente" : "➕ Aggiungi Cliente"}
+          </h2>
 
-        {editingId && (
+          <div style={{ display: "grid", gap: "10px" }}>
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome Cliente"
+              value={form.nome}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+            <input
+              type="text"
+              name="telefono"
+              placeholder="Telefono"
+              value={form.telefono}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+            <input
+              type="text"
+              name="indirizzo_spedizione"
+              placeholder="Indirizzo di Spedizione"
+              value={form.indirizzo_spedizione}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
+
+          {errore && (
+            <p style={{ color: "red", marginTop: "10px" }}>{errore}</p>
+          )}
+
           <button
-            onClick={() => {
-              setEditingId(null);
-              setForm({ nome: "", telefono: "", indirizzo_spedizione: "" });
-            }}
+            onClick={salvaCliente}
             style={{
-              marginLeft: "10px",
-              background: "#999",
+              marginTop: "1rem",
+              background: "#4caf50",
               color: "white",
               padding: "0.6rem 1rem",
               border: "none",
@@ -148,12 +149,32 @@ export default function Clienti() {
               cursor: "pointer",
             }}
           >
-            Annulla
+            {editingId ? "💾 Salva Modifiche" : "➕ Aggiungi Cliente"}
           </button>
-        )}
-      </div>
 
-      {/* 📋 Tabella clienti */}
+          {editingId && (
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setForm({ nome: "", telefono: "", indirizzo_spedizione: "" });
+                setErrore("");
+              }}
+              style={{
+                marginLeft: "10px",
+                background: "#999",
+                color: "white",
+                padding: "0.6rem 1rem",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              Annulla
+            </button>
+          )}
+        </div>
+      )}
+
       <table
         style={{
           width: "100%",
@@ -169,13 +190,16 @@ export default function Clienti() {
             <th style={thStyle}>Nome</th>
             <th style={thStyle}>Telefono</th>
             <th style={thStyle}>Indirizzo</th>
-            <th style={thStyle}>Azioni</th>
+            {!isOperatore && <th style={thStyle}>Azioni</th>}
           </tr>
         </thead>
         <tbody>
           {clienti.length === 0 ? (
             <tr>
-              <td colSpan="4" style={{ textAlign: "center", padding: "1rem" }}>
+              <td
+                colSpan={isOperatore ? "3" : "4"}
+                style={{ textAlign: "center", padding: "1rem" }}
+              >
                 Nessun cliente presente
               </td>
             </tr>
@@ -185,14 +209,16 @@ export default function Clienti() {
                 <td style={tdStyle}>{c.nome}</td>
                 <td style={tdStyle}>{c.telefono}</td>
                 <td style={tdStyle}>{c.indirizzo_spedizione}</td>
-                <td style={{ ...tdStyle, textAlign: "center" }}>
-                  <button onClick={() => modificaCliente(c)} style={btnEdit}>
-                    ✏️
-                  </button>
-                  <button onClick={() => eliminaCliente(c.id)} style={btnDelete}>
-                    🗑️
-                  </button>
-                </td>
+                {!isOperatore && (
+                  <td style={{ ...tdStyle, textAlign: "center" }}>
+                    <button onClick={() => modificaCliente(c)} style={btnEdit}>
+                      ✏️
+                    </button>
+                    <button onClick={() => eliminaCliente(c.id)} style={btnDelete}>
+                      🗑️
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           )}
@@ -202,7 +228,6 @@ export default function Clienti() {
   );
 }
 
-// 🎨 Stili riutilizzabili
 const inputStyle = {
   padding: "0.6rem",
   borderRadius: "6px",
@@ -239,4 +264,3 @@ const btnDelete = {
   padding: "0.4rem 0.6rem",
   cursor: "pointer",
 };
-
