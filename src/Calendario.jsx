@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import axios from "axios";
-
-const API = "https://noleggio-cantinota-backend.onrender.com";
+import { api } from "./api"; // ✅ IMPORT CORRETTO
 
 export default function Calendario() {
   const [ordini, setOrdini] = useState([]);
@@ -18,24 +16,23 @@ export default function Calendario() {
 
   const caricaOrdini = async () => {
     try {
-      const res = await axios.get(`${API}/ordini`);
+      const res = await api.get("/ordini"); // ✅ FIX
       setOrdini(res.data);
     } catch (err) {
       console.error("Errore nel caricamento ordini:", err);
     }
   };
 
-  // Crea eventi per il calendario
   const eventi = ordini.flatMap((o) => [
     {
       id: o.id,
       title: `📦 Consegna - ${o.cliente}`,
       start: o.data_consegna,
       color: o.pagato
-        ? "#4CAF50" // verde se pagato
+        ? "#4CAF50"
         : o.consegnato
-        ? "#2196F3" // blu se consegnato ma non pagato
-        : "#FFC107", // giallo se da consegnare
+        ? "#2196F3"
+        : "#FFC107",
       extendedProps: o,
       tipo: "consegna",
     },
@@ -43,7 +40,7 @@ export default function Calendario() {
       id: `${o.id}-ritiro`,
       title: `🔁 Ritiro - ${o.cliente}`,
       start: o.data_ritiro,
-      color: o.ritirato ? "#8BC34A" : "#F44336", // verde se ritirato, rosso se no
+      color: o.ritirato ? "#8BC34A" : "#F44336",
       extendedProps: o,
       tipo: "ritiro",
     },
@@ -63,7 +60,7 @@ export default function Calendario() {
     if (!eventoSelezionato) return;
     setSalvando(true);
     try {
-      await axios.patch(`${API}/ordini/${eventoSelezionato.id}/stato`, {
+      await api.patch(`/ordini/${eventoSelezionato.id}/stato`, { // ✅ FIX
         consegnato: eventoSelezionato.consegnato,
         ritirato: eventoSelezionato.ritirato,
         pagato: eventoSelezionato.pagato,
@@ -162,7 +159,9 @@ export default function Calendario() {
               ✖
             </button>
 
-            <h2 style={{ marginBottom: "1rem", textAlign: "center" }}>Dettagli Ordine</h2>
+            <h2 style={{ marginBottom: "1rem", textAlign: "center" }}>
+              Dettagli Ordine
+            </h2>
             <p><strong>Cliente:</strong> {eventoSelezionato.cliente}</p>
             <p><strong>Materiale:</strong> {eventoSelezionato.materiale}</p>
             <p><strong>Quantità:</strong> {eventoSelezionato.quantita}</p>
@@ -222,4 +221,3 @@ export default function Calendario() {
     </div>
   );
 }
-
