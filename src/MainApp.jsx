@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import App from "./App";
 import Clienti from "./Clienti";
 import Materiali from "./Materiali";
+import Disponibilita from "./Disponibilita";
 import Calendario from "./Calendario";
 import Profitti from "./Profitti";
 import Login from "./Login";
@@ -11,6 +12,7 @@ const pages = {
   noleggi: "Gestione",
   clienti: "Clienti",
   materiali: "Materiali",
+  disponibilita: "Disponibilità",
   calendario: "Calendario",
   profitti: "Profitti",
 };
@@ -20,7 +22,6 @@ export default function MainApp() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(localStorage.getItem("role"));
 
-  // salva token e ruolo
   useEffect(() => {
     if (token) localStorage.setItem("token", token);
     else localStorage.removeItem("token");
@@ -39,7 +40,6 @@ export default function MainApp() {
     setPagina("noleggi");
   };
 
-  // blocca accesso profitti per operatore
   useEffect(() => {
     if (token && isOperatore && pagina === "profitti") {
       setPagina("noleggi");
@@ -87,6 +87,7 @@ export default function MainApp() {
         {pagina === "noleggi" && <App role={role} />}
         {pagina === "clienti" && <Clienti role={role} />}
         {pagina === "materiali" && <Materiali role={role} />}
+        {pagina === "disponibilita" && <Disponibilita role={role} />}
         {pagina === "calendario" && <Calendario role={role} />}
         {pagina === "profitti" && !isOperatore && <Profitti role={role} />}
       </main>
