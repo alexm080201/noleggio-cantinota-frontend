@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { api } from "./api"; // ✅ IMPORT CORRETTO
+import { api } from "./api";
 
 export default function Calendario() {
   const [ordini, setOrdini] = useState([]);
@@ -16,7 +16,7 @@ export default function Calendario() {
 
   const caricaOrdini = async () => {
     try {
-      const res = await api.get("/ordini"); // ✅ FIX
+      const res = await api.get("/ordini");
       setOrdini(res.data);
     } catch (err) {
       console.error("Errore nel caricamento ordini:", err);
@@ -59,12 +59,14 @@ export default function Calendario() {
   const salvaStatoOrdine = async () => {
     if (!eventoSelezionato) return;
     setSalvando(true);
+
     try {
-      await api.patch(`/ordini/${eventoSelezionato.id}/stato`, { // ✅ FIX
+      await api.patch(`/ordini/${eventoSelezionato.id}/stato`, {
         consegnato: eventoSelezionato.consegnato,
         ritirato: eventoSelezionato.ritirato,
         pagato: eventoSelezionato.pagato,
       });
+
       await caricaOrdini();
       chiudiPopup();
     } catch (err) {
@@ -139,7 +141,9 @@ export default function Calendario() {
               background: "white",
               padding: "2rem",
               borderRadius: "10px",
-              width: "400px",
+              width: "420px",
+              maxHeight: "85vh",
+              overflowY: "auto",
               boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
               position: "relative",
             }}
@@ -162,13 +166,41 @@ export default function Calendario() {
             <h2 style={{ marginBottom: "1rem", textAlign: "center" }}>
               Dettagli Ordine
             </h2>
-            <p><strong>Cliente:</strong> {eventoSelezionato.cliente}</p>
-            <p><strong>Materiale:</strong> {eventoSelezionato.materiale}</p>
-            <p><strong>Quantità:</strong> {eventoSelezionato.quantita}</p>
-            <p><strong>Consegna:</strong> {formattaData(eventoSelezionato.data_consegna)}</p>
-            <p><strong>Ritiro:</strong> {formattaData(eventoSelezionato.data_ritiro)}</p>
-            <p><strong>Km:</strong> {eventoSelezionato.km}</p>
-            <p><strong>Totale:</strong> € {Number(eventoSelezionato.totale || 0).toFixed(2)}</p>
+
+            <p>
+              <strong>Cliente:</strong> {eventoSelezionato.cliente}
+            </p>
+
+            <div style={{ marginBottom: "1rem" }}>
+              <strong>Materiali:</strong>
+              {eventoSelezionato.materiali?.length ? (
+                <ul style={{ marginTop: "8px", paddingLeft: "20px" }}>
+                  {eventoSelezionato.materiali.map((m, i) => (
+                    <li key={i}>
+                      {m.materiale} — Quantità: {m.quantita}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ marginTop: "8px" }}>Nessun materiale</p>
+              )}
+            </div>
+
+            <p>
+              <strong>Consegna:</strong>{" "}
+              {formattaData(eventoSelezionato.data_consegna)}
+            </p>
+            <p>
+              <strong>Ritiro:</strong>{" "}
+              {formattaData(eventoSelezionato.data_ritiro)}
+            </p>
+            <p>
+              <strong>Km:</strong> {eventoSelezionato.km}
+            </p>
+            <p>
+              <strong>Totale:</strong> €{" "}
+              {Number(eventoSelezionato.totale || 0).toFixed(2)}
+            </p>
 
             <div style={{ marginTop: "1rem" }}>
               <label>
