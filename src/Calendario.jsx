@@ -168,7 +168,17 @@ export default function Calendario() {
             </h2>
 
             <p>
+              <strong>N° prenotazione:</strong>{" "}
+              {eventoSelezionato.numero_prenotazione || "-"}
+            </p>
+
+            <p>
               <strong>Cliente:</strong> {eventoSelezionato.cliente}
+            </p>
+
+            <p>
+              <strong>Indirizzo di consegna:</strong>{" "}
+              {eventoSelezionato.indirizzo_spedizione || "-"}
             </p>
 
             <div style={{ marginBottom: "1rem" }}>
