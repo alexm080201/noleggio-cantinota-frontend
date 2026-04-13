@@ -5,6 +5,7 @@ function App({ role = "admin" }) {
   const [clienti, setClienti] = useState([]);
   const [materiali, setMateriali] = useState([]);
   const [ordini, setOrdini] = useState([]);
+  const [numeroPrenotazione, setNumeroPrenotazione] = useState("");
   const [dataConsegna, setDataConsegna] = useState("");
   const [dataRitiro, setDataRitiro] = useState("");
   const [clienteId, setClienteId] = useState("");
@@ -56,6 +57,7 @@ function App({ role = "admin" }) {
   };
 
   const resetForm = () => {
+    setNumeroPrenotazione("");
     setClienteId("");
     setDataConsegna("");
     setDataRitiro("");
@@ -85,6 +87,7 @@ function App({ role = "admin" }) {
 
       const ordine = {
         cliente_id: parseInt(clienteId),
+        numero_prenotazione: numeroPrenotazione.trim() || null,
         materiali: materialiValidi.map((m) => ({
           materiale_id: parseInt(m.materiale_id),
           quantita: parseInt(m.quantita),
@@ -128,6 +131,7 @@ function App({ role = "admin" }) {
     if (isOperatore) return;
 
     setModificaOrdine(ordine);
+    setNumeroPrenotazione(String(ordine.numero_prenotazione || ""));
     setClienteId(String(ordine.cliente_id));
     setDataConsegna(ordine.data_consegna?.slice(0, 10) || "");
     setDataRitiro(ordine.data_ritiro?.slice(0, 10) || "");
@@ -172,6 +176,17 @@ function App({ role = "admin" }) {
           }}
         >
           <h2>{modificaOrdine ? "✏️ Modifica ordine" : "➕ Crea nuovo ordine"}</h2>
+
+          <label>Numero prenotazione:</label>
+          <br />
+          <input
+            type="text"
+            value={numeroPrenotazione}
+            onChange={(e) => setNumeroPrenotazione(e.target.value)}
+            placeholder="Inserisci numero prenotazione"
+          />
+          <br />
+          <br />
 
           <label>Cliente:</label>
           <br />
@@ -314,6 +329,7 @@ function App({ role = "admin" }) {
       >
         <thead style={{ background: "#ddd" }}>
           <tr>
+            <th>N° prenotazione</th>
             <th>Cliente</th>
             <th>Materiale</th>
             <th>Quantità</th>
@@ -329,11 +345,12 @@ function App({ role = "admin" }) {
         <tbody>
           {ordini.length === 0 ? (
             <tr>
-              <td colSpan={isOperatore ? "9" : "10"}>Nessun ordine presente</td>
+              <td colSpan={isOperatore ? "10" : "11"}>Nessun ordine presente</td>
             </tr>
           ) : (
             ordini.map((o, i) => (
               <tr key={o.id ?? i}>
+                <td>{o.numero_prenotazione || "-"}</td>
                 <td>{o.cliente}</td>
 
                 <td>
